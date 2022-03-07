@@ -14,3 +14,5 @@ To build and run (in project root):
 >
 >docker-compose up
 
+
+The Django API is running on localhost:8000 and the React app is on localhost:3000.
