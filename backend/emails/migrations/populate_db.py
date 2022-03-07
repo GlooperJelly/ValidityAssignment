@@ -1,5 +1,5 @@
 from django.db import migrations
-from emails.email_parser import parse_file
+from emails.email_parser import parse_file, decode_mime_words
 from email import utils
 
 
@@ -9,8 +9,12 @@ def create_initial_data(apps, schema_editor):
     emails = parse_file(FILENAME)
     Email = apps.get_model('emails', 'Email')
     for message in emails:
-        message_datetime = utils.parsedate_to_datetime( message.get('Date') )
-        email_db = Email( to_field=message.get('To'), from_field=message.get('From'), date=message_datetime, subject=message.get('subject'), message_id=message.get('Message-ID'))
+        email_db = Email( 
+            to_field = decode_mime_words( message.get('To') ), 
+            from_field = decode_mime_words( message.get('From') ), 
+            date = utils.parsedate_to_datetime( message.get('Date') ), 
+            subject = decode_mime_words( message.get('Subject') ), 
+            message_id = message.get('Message-ID'))
         email_db.save()
 
 class Migration(migrations.Migration):

@@ -4,16 +4,19 @@ services:
   db:
     image: postgres
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - ./backend/data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+
   web:
-    build: .
+    build: 
+      context: ./backend/
+      dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/code
+      - .:/backend/code
     ports:
       - "8000:8000"
     environment:
@@ -23,3 +26,16 @@ services:
     depends_on:
       - db
 
+  frontend:
+    restart: always
+    command: npm start
+    container_name: frontend
+    build: 
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    depends_on:
+      - web
+    
